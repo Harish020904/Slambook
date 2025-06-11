@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLAM Chronicles - Where Memories Become Eternal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@400;700&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: linear-gradient(135deg, #2c1810 0%, #1a0f08 50%, #2c1810 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, #d4af37, transparent);
+            border-radius: 50%;
+            animation: float 6s infinite ease-in-out;
+            opacity: 0.7;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+        }
+
+        /* Main container */
+        .main-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+        }
+
+        /* Welcome screen */
+        .welcome-screen {
+            text-align: center;
+            background: rgba(248, 245, 240, 0.95);
+            border: 3px solid #d4af37;
+            border-radius: 20px;
+            padding: 60px 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transform: perspective(1000px) rotateX(5deg);
+            transition: all 0.5s ease;
+        }
+
+        .welcome-screen:hover {
+            transform: perspective(1000px) rotateX(0deg) scale(1.02);
+        }
+
+        .main-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            color: #8b4513;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #8b4513, #d4af37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            color: #5d4e37;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .description {
+            font-size: 1.2rem;
+            color: #2c1810;
+            margin-bottom: 50px;
+            line-height: 1.6;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Login form */
+        .login-form {
+            display: none;
+            background: rgba(248, 245, 240, 0.95);
+            border: 3px solid #d4af37;
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .login-form.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: #8b4513;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 1.1rem;
+            color: #5d4e37;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #d4af37;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Crimson Text', serif;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #8b4513;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+            transform: scale(1.02);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #d4af37;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Crimson Text', serif;
+            background: rgba(255, 255, 255, 0.9);
+            resize: vertical;
+            min-height: 100px;
+            transition: all 0.3s ease;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #8b4513;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #d4af37, #f4e4a6);
+            color: #2c1810;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-family: 'Crimson Text', serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+            margin: 10px;
+            display: inline-block;
+            text-decoration: none;
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+            background: linear-gradient(135deg, #f4e4a6, #d4af37);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b4513, #a0522d);
+            color: #f8f5f0;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #a0522d, #8b4513);
+        }
+
+        /* Navigation dashboard */
+        .dashboard {
+            display: none;
+            background: rgba(248, 245, 240, 0.95);
+            border: 3px solid #d4af37;
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .dashboard.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .dashboard-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: #8b4513;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .welcome-message {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #5d4e37;
+            margin-bottom: 40px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #d4af37;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+            border-color: #8b4513;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .feature-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: #8b4513;
+            margin-bottom: 10px;
+        }
+
+        .feature-description {
+            color: #5d4e37;
+            line-height: 1.5;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #f44336;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .success-message {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #4caf50;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        /* User info display */
+        .user-info {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid #d4af37;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            min-width: auto;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(135deg, #c82333, #dc3545);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+
+            .welcome-screen, .login-form, .dashboard {
+                padding: 30px 20px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="particles" id="particles"></div>
+
+    <div class="main-container">
+        <!-- Welcome Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <h1 class="main-title">SLAM Chronicles</h1>
+            <p class="subtitle">Where Memories Become Eternal</p>
+            <p class="description">
+                Welcome to your personal digital sanctuary where every memory, every secret, and every precious moment
+                finds its perfect home. Create, explore, and preserve the stories that make you who you are.
+            </p>
+
+            <button class="btn btn-primary" onclick="showLoginForm()">Enter Your Chronicles</button>
+            <button class="btn" onclick="showNewUserSetup()">Create New Chronicles</button>
+        </div>
+
+        <!-- Login Form for Existing Users -->
+        <div class="login-form" id="loginForm">
+            <h2 class="form-title">Welcome Back</h2>
+            <div class="input-group">
+                <label class="input-label">Your Secret Name:</label>
+                <input type="text" class="form-input" id="loginSecretName" placeholder="Enter your secret name...">
+            </div>
+            <div class="input-group">
+                <label class="input-label">Your Secret Message:</label>
+                <input type="password" class="form-input" id="loginSecretMessage" placeholder="Enter your secret message...">
+            </div>
+            <div class="error-message" id="loginError"></div>
+            <div style="text-align: center;">
+                <button class="btn btn-primary" onclick="handleLogin()">Enter Chronicles</button>
+                <button class="btn" onclick="showWelcomeScreen()">Back</button>
+            </div>
+        </div>
+
+        <!-- New User Setup -->
+        <div class="login-form" id="newUserForm">
+            <h2 class="form-title">Create Your Chronicles</h2>
+            <div class="input-group">
+                <label class="input-label">Choose Your Secret Name:</label>
+                <input type="text" class="form-input" id="newSecretName" placeholder="A name only you know...">
+                <small style="color: #666;">This will be your unique identifier</small>
+            </div>
+            <div class="input-group">
+                <label class="input-label">Create Your Secret Message:</label>
+                <input type="password" class="form-input" id="newSecretMessage" placeholder="A phrase that unlocks your memories...">
+                <small style="color: #666;">Keep this safe - you'll need it to access your chronicles</small>
+            </div>
+            <div class="input-group">
+                <label class="input-label">Tell us about yourself (optional):</label>
+                <textarea class="form-textarea" id="userBio" placeholder="Share a little about who you are..."></textarea>
+            </div>
+            <div class="error-message" id="setupError"></div>
+            <div class="success-message" id="setupSuccess"></div>
+            <div style="text-align: center;">
+                <button class="btn btn-primary" onclick="handleNewUserSetup()">Create My Chronicles</button>
+                <button class="btn" onclick="showWelcomeScreen()">Back</button>
+            </div>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div class="dashboard" id="dashboard">
+            <div class="user-info" id="userInfo">
+                <h2 class="dashboard-title">Your Personal Chronicles</h2>
+                <p class="welcome-message" id="welcomeMessage"></p>
+                <button class="btn logout-btn" onclick="logout()">Logout</button>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card" onclick="navigateTo('text-editor/text-editor.html')">
+                    <span class="feature-icon">📝</span>
+                    <h3 class="feature-title">Memory Editor</h3>
+                    <p class="feature-description">Write and preserve your precious memories with our beautiful text editor</p>
+                </div>
+
+                <div class="feature-card" onclick="navigateTo('ai chatbot/chatbot.html')">
+                    <span class="feature-icon">🤖</span>
+                    <h3 class="feature-title">AI Companion</h3>
+                    <p class="feature-description">Chat with your AI companion about relationships, friends, and family</p>
+                </div>
+
+                <div class="feature-card" onclick="navigateTo('secret namepage/secret-name.html')">
+                    <span class="feature-icon">🔒</span>
+                    <h3 class="feature-title">Secret Name</h3>
+                    <p class="feature-description">Explore and document your secret identity and hidden self</p>
+                </div>
+
+                <div class="feature-card" onclick="navigateTo('secret-message/secret-message.html')">
+                    <span class="feature-icon">💌</span>
+                    <h3 class="feature-title">Secret Messages</h3>
+                    <p class="feature-description">Create and store your most private thoughts and messages</p>
+                </div>
+
+                <div class="feature-card" onclick="navigateTo('bookshelf/shelf.html')">
+                    <span class="feature-icon">📚</span>
+                    <h3 class="feature-title">Memory Bookshelf</h3>
+                    <p class="feature-description">Browse and organize your collection of memories and stories</p>
+                </div>
+
+                <div class="feature-card" onclick="navigateTo('login page/index.html')">
+                    <span class="feature-icon">🎭</span>
+                    <h3 class="feature-title">Legacy Login</h3>
+                    <p class="feature-description">Access the original mystical login experience</p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn" onclick="navigateTo('test_gemini.html')">🧪 Test AI Features</button>
+                <button class="btn" onclick="navigateTo('react-app.html')">🚀 React App</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class SlamChroniclesApp {
+            constructor() {
+                this.currentUser = null;
+                this.users = JSON.parse(localStorage.getItem('slamChroniclesUsers')) || {};
+                this.init();
+            }
+
+            init() {
+                this.createParticles();
+                this.checkExistingSession();
+            }
+
+            createParticles() {
+                const particlesContainer = document.getElementById('particles');
+                const particleCount = 50;
+
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.top = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 6 + 's';
+                    particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                    particlesContainer.appendChild(particle);
+                }
+            }
+
+            checkExistingSession() {
+                const savedUser = localStorage.getItem('currentSlamUser');
+                if (savedUser) {
+                    this.currentUser = savedUser;
+                    this.showDashboard();
+                }
+            }
+
+            showScreen(screenId) {
+                // Hide all screens
+                document.getElementById('welcomeScreen').style.display = 'none';
+                document.getElementById('loginForm').classList.remove('active');
+                document.getElementById('newUserForm').classList.remove('active');
+                document.getElementById('dashboard').classList.remove('active');
+
+                // Show selected screen
+                if (screenId === 'welcome') {
+                    document.getElementById('welcomeScreen').style.display = 'block';
+                } else {
+                    document.getElementById(screenId).classList.add('active');
+                }
+
+                // Clear any error messages
+                this.clearMessages();
+            }
+
+            showWelcomeScreen() {
+                this.showScreen('welcome');
+            }
+
+            showLoginForm() {
+                this.showScreen('loginForm');
+            }
+
+            showNewUserSetup() {
+                this.showScreen('newUserForm');
+            }
+
+            showDashboard() {
+                this.showScreen('dashboard');
+                const welcomeMessage = document.getElementById('welcomeMessage');
+                welcomeMessage.textContent = `Welcome back, ${this.currentUser}! Your chronicles await you.`;
+            }
+
+            handleLogin() {
+                const secretName = document.getElementById('loginSecretName').value.trim();
+                const secretMessage = document.getElementById('loginSecretMessage').value.trim();
+
+                if (!secretName || !secretMessage) {
+                    this.showError('loginError', 'Please enter both your secret name and message');
+                    return;
+                }
+
+                if (this.users[secretName] && this.users[secretName].secretMessage === secretMessage) {
+                    this.currentUser = secretName;
+                    localStorage.setItem('currentSlamUser', secretName);
+                    localStorage.setItem('currentUser', secretName); // For compatibility with other pages
+                    this.showDashboard();
+                } else {
+                    this.showError('loginError', 'Invalid credentials. Please check your secret name and message.');
+                }
+            }
+
+            handleNewUserSetup() {
+                const secretName = document.getElementById('newSecretName').value.trim();
+                const secretMessage = document.getElementById('newSecretMessage').value.trim();
+                const userBio = document.getElementById('userBio').value.trim();
+
+                if (!secretName || !secretMessage) {
+                    this.showError('setupError', 'Please enter both a secret name and message');
+                    return;
+                }
+
+                if (this.users[secretName]) {
+                    this.showError('setupError', 'This secret name is already taken. Please choose another.');
+                    return;
+                }
+
+                // Create new user
+                this.users[secretName] = {
+                    secretMessage: secretMessage,
+                    bio: userBio,
+                    createdAt: new Date().toISOString(),
+                    memories: [],
+                    secretNames: [],
+                    secretMessages: []
+                };
+
+                // Save to localStorage
+                localStorage.setItem('slamChroniclesUsers', JSON.stringify(this.users));
+
+                this.showSuccess('setupSuccess', 'Your chronicles have been created successfully!');
+
+                setTimeout(() => {
+                    this.currentUser = secretName;
+                    localStorage.setItem('currentSlamUser', secretName);
+                    localStorage.setItem('currentUser', secretName); // For compatibility
+                    this.showDashboard();
+                }, 2000);
+            }
+
+            showError(elementId, message) {
+                const errorElement = document.getElementById(elementId);
+                errorElement.textContent = message;
+                errorElement.classList.add('show');
+                setTimeout(() => {
+                    errorElement.classList.remove('show');
+                }, 5000);
+            }
+
+            showSuccess(elementId, message) {
+                const successElement = document.getElementById(elementId);
+                successElement.textContent = message;
+                successElement.classList.add('show');
+                setTimeout(() => {
+                    successElement.classList.remove('show');
+                }, 3000);
+            }
+
+            clearMessages() {
+                document.querySelectorAll('.error-message, .success-message').forEach(el => {
+                    el.classList.remove('show');
+                });
+            }
+
+            logout() {
+                localStorage.removeItem('currentSlamUser');
+                localStorage.removeItem('currentUser');
+                this.currentUser = null;
+                this.showWelcomeScreen();
+            }
+
+            navigateTo(path) {
+                window.open(path, '_blank');
+            }
+        }
+
+        // Global functions for onclick handlers
+        let app;
+
+        function showWelcomeScreen() { app.showWelcomeScreen(); }
+        function showLoginForm() { app.showLoginForm(); }
+        function showNewUserSetup() { app.showNewUserSetup(); }
+        function handleLogin() { app.handleLogin(); }
+        function handleNewUserSetup() { app.handleNewUserSetup(); }
+        function logout() { app.logout(); }
+        function navigateTo(path) { app.navigateTo(path); }
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new SlamChroniclesApp();
+        });
+
+        // Add some magical cursor effects
+        document.addEventListener('mousemove', (e) => {
+            const trail = document.createElement('div');
+            trail.style.position = 'fixed';
+            trail.style.left = e.clientX + 'px';
+            trail.style.top = e.clientY + 'px';
+            trail.style.width = '6px';
+            trail.style.height = '6px';
+            trail.style.background = 'radial-gradient(circle, rgba(212, 175, 55, 0.6), transparent)';
+            trail.style.borderRadius = '50%';
+            trail.style.pointerEvents = 'none';
+            trail.style.zIndex = '5';
+            trail.style.transition = 'all 0.5s ease-out';
+            document.body.appendChild(trail);
+
+            setTimeout(() => {
+                trail.style.opacity = '0';
+                trail.style.transform = 'scale(2)';
+                setTimeout(() => {
+                    document.body.removeChild(trail);
+                }, 500);
+            }, 100);
+        });
+    </script>
+</body>
+</html>
